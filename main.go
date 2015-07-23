@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Fprintln(os.Stderr, "yomikawa [word]")
+		fmt.Fprintln(os.Stderr, "yomikata [word]")
 		os.Exit(1)
 	}
 	word := os.Args[1]
