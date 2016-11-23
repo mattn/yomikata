@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -8,12 +9,18 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+var (
+	exact = flag.Bool("exact", false, "exact")
+)
+
 func main() {
-	if len(os.Args) != 2 {
+	flag.Parse()
+
+	if flag.NArg() != 1 {
 		fmt.Fprintln(os.Stderr, "yomikata [word]")
 		os.Exit(1)
 	}
-	word := os.Args[1]
+	word := flag.Arg(0)
 	resp, err := http.Get("http://yomikata.org/word/" + word)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, os.Args[0]+":", err)
@@ -28,7 +35,11 @@ func main() {
 		fmt.Fprintln(os.Stderr, "わかりません")
 		os.Exit(1)
 	}
-	doc.Find(".spAns").Each(func(_ int, s *goquery.Selection) {
-		fmt.Printf("%s (%s)\n", s.Find(".psAns").Text(), s.Find(".psPt").Text())
-	})
+	if *exact {
+		fmt.Println(doc.Find(".spAns .psAns").First().Text())
+	} else {
+		doc.Find(".spAns").Each(func(_ int, s *goquery.Selection) {
+			fmt.Printf("%s (%s)\n", s.Find(".psAns").Text(), s.Find(".psPt").Text())
+		})
+	}
 }
